@@ -255,7 +255,7 @@ func NewWindow(options WebviewWindowOptions) *WebviewWindow {
 			shouldClose = result.options.ShouldClose(result)
 		}
 		if shouldClose {
-			result.markAsDestroyed()
+			InvokeSync(result.markAsDestroyed)
 			InvokeSync(result.impl.close)
 			globalApplication.deleteWindowByID(result.id)
 		}
@@ -1010,10 +1010,8 @@ func (w *WebviewWindow) Close() {
 	if w.impl == nil && !w.isDestroyed() {
 		return
 	}
-	InvokeAsync(func() {
-		// allows use ShouldClose: func(window *application.WebviewWindow) bool {} on NewWebviewWindowWithOptions()
-		w.emit(events.Common.WindowClosing)
-	})
+	// allows use ShouldClose: func(window *application.WebviewWindow) bool {} on NewWebviewWindowWithOptions()
+	w.emit(events.Common.WindowClosing)
 }
 
 func (w *WebviewWindow) Zoom() {
